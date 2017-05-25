@@ -1,0 +1,62 @@
+{% extends "site_base.html" %}
+
+{% load static %}
+{% load i18n %} 
+{% load mathfilters %}
+
+{% block extra_head_base %}
+<meta charset="UTF-8"> 
+<link rel="stylesheet" href="{% static 'polls/font-awesome-4.7.0/css/font-awesome.min.css' %}" />
+<link rel="stylesheet" href="{% static 'polls/stars.css' %}" />
+{% endblock %}
+
+{% block body_base %}
+
+<h1> {{ election.election_text }} </h1>
+
+{% if error_message %}
+	<p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+{% blocktrans with a="test" b="123" %}
+<p> {{ a }} is {{ b }} </p>
+{% endblocktrans %}
+<form action="{% url 'polls:vote' election.id %}" method="post">
+{% csrf_token %}
+
+{% for contest in election.contest_set.all %}
+	<h3>{{ contest.contest_name }}</h3>
+	<div>
+	<table border="0">
+	{% for candidate in contest.candidate_set.all %}
+		<tr>
+		<td>
+		<p style="vertical-align:text-top;">{{ candidate.candidate_name }}</p>
+		</td>
+		<td>
+		<div class="stars">
+		{% for i in "*****" %}
+		{% comment %}
+		<p>{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}</p>
+			<input class="star star-{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}" id="star-{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}" type="radio" name="group{{ contest_num }}-{{ candidate_num }}"/>
+			<label class="star star-{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}" for="star-{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}"></label>
+		{% endcomment %}
+		{% blocktrans with star_num=6|sub:forloop.counter candidate_num=forloop.parentloop.counter contest_num=forloop.parentloop.parentloop.counter %}
+			<input class="star star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}" id="star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}" type="radio" name="group{{ contest_num }}-{{ candidate_num }}"/>
+			<label class="star star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}" for="star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}"></label>
+		{% endblocktrans %}
+		{% endfor %}
+		</div>
+		</td>
+		</tr>
+	{% endfor %}
+	</table>
+	</div>
+	<br />
+{% endfor %}
+
+<div style="clear:left;">
+	<input type="submit" value="Vote!">
+</div>
+</form>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "site_base.html" %}
+
+{% load static %}
+
+{% block body_base %}
+{% if open_election_list %}
+	<ul>
+	{% for election in open_election_list %}
+	<li><a href="{% url 'polls:detail' election.id %}">
+				{{ election.election_name }}</a></li>
+	{% endfor %}
+	</ul>
+{% else %}
+	<p>No polls are available.</p>
+{% endif %}
+
+{% endblock %}
