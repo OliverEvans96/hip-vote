@@ -1,12 +1,85 @@
-<h1> {{ question.question_text }} </h1>
+{% extends "site_base.html" %}
+{% load i18n %}
 
-<ul>
-{% for choice in question.choice_set.all %}
-	<li>
-		{{ choice.choice_text }} -- 
-		{{ choice.votes }} vote{{ choice.votes|pluralize }}
-	</li>
+{% block body_base %}
+
+<div class="container">
+
+{% if election.has_ballots %}
+<h1> Results for {{ election.election_name }} </h1>
+<p>Pairwise comparison tables show the number of voters who prefer candidate on left over candidate on top</p>
+
+
+{% for contest in election.contest_set.all %}
+	<h3>{{ contest.contest_name }}</h3>
+	<p>Votes received (excluding abstains): {{ contest.num_meaningful_ballots }}</p>
+	<br />
+	{% if contest.is_tied %}
+		<p>Tied winners: <strong>{{ contest.tied_winner_names }}</strong></p>
+	{% else %}
+		<p>Winner: <strong>{{ contest.winner }}</strong></p>
+	{% endif %}
+	<br />
+
+	<p>Pairwise comparisons</p>
+	<div style="width:300px">
+	<table class="table table-bordered">
+
+	<tr>
+	<td></td>
+	{% for can2 in contest.sorted_candidates %}
+		<td>{{ can2 }}</td>
+	{% endfor %}
+
+	{% for can1,dct1 in contest.pairs.items %}
+		<tr>
+		<td>{{ can1 }}</td>
+		{% for can2,pair in dct1.items %}
+			{% if can1 == can2 %}
+			<td>
+			{% elif pair.1 > 0 %}
+			<td class="success">
+			{% elif pair.1 < 0 %}
+			<td class="danger">
+			{% else %}
+			<td class="warning">
+			{% endif %}
+				{{ pair.0 }}
+			</td>
+		{% endfor %}
+		</tr>
+	{% endfor %}
+	</table>
+	</div>
+	<br />
+
+	<p>Ballots:</p>
+	<table class="table table-bordered" style="width:auto">
+	<tr>
+		<td>Ballot</td>
+		<td># of voters</td>
+	</tr>
+	{% for ballot, count in contest.simple_ballot_list %}
+		<tr>
+			<td>{{ ballot }}</td>
+			<td>{{ count }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+
+	<br />
+	<hr>
+	<br />
 {% endfor %}
-</ul>
 
-<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+</div>
+
+{% else %}
+<h3>No votes for {{ election.election_name }}</h3>
+{% endif %}
+
+<br />
+<a href="{% url 'polls:index' %}">Back to elections</a>
+
+</div>
+{% endblock %}

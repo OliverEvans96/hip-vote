@@ -8,77 +8,43 @@
 
 {% block body_base %}
 
-    <section class="jumbotron">
-        <div class="container">
-            {% include "_messages.html" %}
-            <h1>{% blocktrans %}Welcome to<br>pinax-project-account{% endblocktrans %}</h1>
-            <p>
-                {% blocktrans %}
-                In addition to what is provided by the "zero" project, this project
-                provides thorough integration with django-user-accounts, adding
-                comprehensive account management functionality. It is a foundation
-                suitable for most sites that have user accounts.
-                {% endblocktrans %}
-            </p>
-            {% if not user.is_authenticated %}
-            {% url "account_login" as login_url %}
-            {% url "account_signup" as signup_url %}
-            <p>{% blocktrans %}You can <a href="{{ login_url }}" class="btn btn-default">Log In</a> or <a href="{{ signup_url }}" class="btn btn-primary">Sign Up</a> to try out the site.{% endblocktrans %}</p>
-            {% endif %}
-        </div>
-    </section>
-    <section>
-        <div class="container">
+<section>
+<div class="container">
 
-	<a href="{% url 'polls:index' %}">Polls</a>
-	<br />
-	<a href="{% url 'admin:index' %}">Admin</a>
-	<br />
+<h3>Welcome to the HiP House voting website!</h3>
+<br />
 
-            <h2 class="text-center">{% blocktrans %}What is Pinax?{% endblocktrans %}</h2>
-            <p class="lead">
-                {% blocktrans %}
-                <b>Pinax</b> is an open-source platform based on Django and
-                intended to provide a starting point for websites. It takes
-                care of the things that many sites have in common, so you can
-                focus on what makes your site different.
-                {% endblocktrans %}
-            </p>
-            <div class="feature-columns">
-                <div>
-                    <i class="fa fa-cubes fa-3x"></i><br>
-                    {% blocktrans %}
-                    <b>Starter projects</b> provide project layout,
-                    scaffolding, already integrated components and
-                    ready-to-go code.
-                    {% endblocktrans %}
-                </div>
-                <div>
-                    <i class="fa fa-puzzle-piece fa-3x"></i><br>
-                    {% blocktrans %}
-                    <b>Reusable apps</b> provide common
-                    infrastructure, back-end functionality,
-                    and user-facing components.
-                    {% endblocktrans %}
-                </div>
-                <div>
-                    <i class="fa fa-tint fa-3x"></i><br>
-                    {% blocktrans %}
-                    <b>Themes</b> provide default templates and
-                    stylesheets for quick prototyping and easy customization.
-                    {% endblocktrans %}
-                </div>
-            </div>
-        </div>
-    </section>
-    <section>
-        <div class="container">
-            <p class="lead text-center">
-                {% blocktrans %}
-                See <a href="http://pinaxproject.com/">pinaxproject.com</a>
-                for more information.
-                {% endblocktrans %}
-            </p>
-        </div>
-    </section>
+From the Bylaws:
+<br />
+<br />
+
+<blockquote>
+	<p style="font-size:10pt">
+	5. Elections. Elections of managers are by secret ballot. Each voter ranks the candidates running for the position. Candidates can be ranked equally to indicate that they are equally preferred. Not all have to be ranked; ranked candidates are considered preferred to unranked candidates. "None of the above" can be ranked as though it were a candidate; if it wins, no one is elected and a new election is held later. Ballots are tabulated using the Schulze method. If a computer program is used to tabulate ballots, the source code and the input given to it for each election must be available to any interested house member.
+	</p>
+</blockquote>
+
+<center>
+<a href="{% url 'polls:index' %}" class="btn btn-success"><h3>Vote Here!</h3></a>
+</center>
+
+<br />
+
+Internal links:
+<ul>
+	<li><a href="{% url 'admin:index' %}">Admin</a></li>
+</ul>
+
+External links:
+<ul>
+	<li><a href="https://en.wikipedia.org/wiki/Schulze_method">Schulze method</a></li>
+	<li><a href="https://en.wikipedia.org/wiki/Condorcet_method">Condorcet methods</a></li>
+	<li><a href="https://en.wikipedia.org/wiki/Comparison_of_electoral_systems">Voting method comparison</a></li>
+	<li><a href="https://en.wikipedia.org/wiki/Electoral_system">Electoral system</a></li>
+</ul>
+
+
+</div>
+
+</section>
 {% endblock %}

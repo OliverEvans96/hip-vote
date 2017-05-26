@@ -6,11 +6,14 @@ from .models import Election, Contest, Candidate, Ranking
 #class CandidateInline(admin.TabularInline):
 class CandidateInline(NestedTabularInline):
     model = Candidate
-    extra = 3
+    extra = 2
+    # def get_queryset(self, request):
+    #         qs = super(NestedTabularInline, self).get_queryset(request)
+    #         return qs.exclude(candidate_name='None of the Above')
 
-class ContestInline(NestedTabularInline):
+class ContestInline(NestedStackedInline):
     model = Contest
-    extra = 3
+    extra = 2
     inlines = [CandidateInline]
 
 #class ElectionAdmin(admin.ModelAdmin):

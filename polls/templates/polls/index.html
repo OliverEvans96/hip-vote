@@ -3,15 +3,31 @@
 {% load static %}
 
 {% block body_base %}
+
+<div class="container">
+
+<h3>Open Elections</h3>
 {% if open_election_list %}
 	<ul>
 	{% for election in open_election_list %}
-	<li><a href="{% url 'polls:detail' election.id %}">
-				{{ election.election_name }}</a></li>
+		<li><a href="{% url 'polls:detail' election.id %}">
+			{{ election.election_name }}</a></li>
 	{% endfor %}
 	</ul>
 {% else %}
 	<p>No polls are available.</p>
 {% endif %}
+
+<h3>Previous Election Results</h3>
+{% if prev_election_list %}
+	<ul>
+	{% for election in prev_election_list %}
+		<li><a href="{% url 'polls:results' election.id %}">
+			{{ election.election_name }}</a></li>
+	{% endfor %}
+	</ul>
+{% endif %}
+
+</div>
 
 {% endblock %}

@@ -20,13 +20,15 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 
 from django.conf.urls import url
+from django.contrib.auth.decorators import login_required
 
 from . import views
 
 app_name = 'polls'
 urlpatterns = [
-    url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^(?P<pk>[0-9]+)/$', views.DetailView.as_view(), name='detail'),
-    url(r'^(?P<pk>[0-9]+)/results/$', views.ResultsView.as_view(), name='results'),
-    url(r'^(?P<pk>[0-9]+)/vote/$', views.vote, name='vote'),
+    url(r'^$', login_required(views.IndexView.as_view(),login_url='/account/login'), name='index'),
+    url(r'^(?P<pk>[0-9]+)/$', login_required(views.DetailView.as_view(),login_url='/account/login'), name='detail'),
+    url(r'^(?P<pk>[0-9]+)/results/$', login_required(views.ResultsView.as_view(),login_url='/account/login'), name='results'),
+    url(r'^(?P<pk>[0-9]+)/confirm/$', login_required(views.ResultsView.as_view(),login_url='/account/login'), name='confirm'),
+    url(r'^(?P<pk>[0-9]+)/vote/$', login_required(views.vote,login_url='/account/login'), name='vote'),
 ]

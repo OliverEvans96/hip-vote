@@ -11,38 +11,40 @@
 {% endblock %}
 
 {% block body_base %}
+<div class="container">
 
-<h1> {{ election.election_text }} </h1>
+{% if election.is_currently_open %}
+
+<h1>Ballot for {{ election.election_name }}</h1>
+
+<p>To abstain, rate all candidates equally.</p>
+
+<hr>
 
 {% if error_message %}
 	<p><strong>{{ error_message }}</strong></p>
 {% endif %}
 
-{% blocktrans with a="test" b="123" %}
-<p> {{ a }} is {{ b }} </p>
-{% endblocktrans %}
 <form action="{% url 'polls:vote' election.id %}" method="post">
 {% csrf_token %}
 
 {% for contest in election.contest_set.all %}
+{% blocktrans asvar contest_num %}{{ forloop.counter0 }}{% endblocktrans %}
 	<h3>{{ contest.contest_name }}</h3>
 	<div>
 	<table border="0">
 	{% for candidate in contest.candidate_set.all %}
+	{% blocktrans asvar candidate_num %}{{ forloop.counter0 }}{% endblocktrans %}
 		<tr>
 		<td>
 		<p style="vertical-align:text-top;">{{ candidate.candidate_name }}</p>
 		</td>
 		<td>
 		<div class="stars">
-		{% for i in "*****" %}
-		{% comment %}
-		<p>{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}</p>
-			<input class="star star-{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}" id="star-{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}" type="radio" name="group{{ contest_num }}-{{ candidate_num }}"/>
-			<label class="star star-{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}" for="star-{{ contest_num }}-{{ candidate_num }}-{{ 6|sub:star_num }}"></label>
-		{% endcomment %}
-		{% blocktrans with star_num=6|sub:forloop.counter candidate_num=forloop.parentloop.counter contest_num=forloop.parentloop.parentloop.counter %}
-			<input class="star star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}" id="star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}" type="radio" name="group{{ contest_num }}-{{ candidate_num }}"/>
+		{% for i in contest.get_stars %}
+		{% trans star_num as contest.num_stars|sub:forloop.counter0 %}
+		{% blocktrans with star_num=contest.num_stars|sub:forloop.counter0 candidate_num=forloop.parentloop.counter0 contest_num=forloop.parentloop.parentloop.counter0 %}
+			<input class="star star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}" id="star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}" type="radio" name="group{{ contest_num }}-{{ candidate_num }}" value="{{ star_num }}" checked="checked" />
 			<label class="star star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}" for="star-{{ contest_num }}-{{ candidate_num }}-{{ star_num }}"></label>
 		{% endblocktrans %}
 		{% endfor %}
@@ -52,11 +54,21 @@
 	{% endfor %}
 	</table>
 	</div>
-	<br />
+	<hr>
 {% endfor %}
 
 <div style="clear:left;">
 	<input type="submit" value="Vote!">
 </div>
 </form>
+
+{% else %}
+
+<h3> Voting is closed for {{ election.election_name }} </h3>
+
+{% endif %}
+
+<br />
+<br />
+<a href="{% url 'polls:index' %}">Back to elections</a>
 {% endblock %}

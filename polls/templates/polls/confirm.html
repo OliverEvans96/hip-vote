@@ -1,0 +1,27 @@
+{% extends "site_base.html" %}
+{% load i18n %}
+
+{% block body_base %}
+
+<div class="container-fluid">
+
+<br />
+<h4> Your votes have been saved! </h4>
+<br />
+
+<p>Based on your ratings, the following preferences were inferred:</p>
+
+{% for contest, ballot in contests_and_ballots %}
+	<p><strong>{{ contest }}:</strong> {{ ballot }}</p>
+{% endfor %}
+
+<br />
+Not right? <a href="{% url 'polls:detail' election.pk %}">Modify your vote</a>
+
+<br />
+<br />
+<a href="{% url 'polls:index' %}">Back to elections</a>
+
+</div>
+
+{% endblock %}
