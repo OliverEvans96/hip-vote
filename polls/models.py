@@ -32,6 +32,9 @@ class Election(models.Model):
         now = timezone.now()
         return self.close_date <= now
 
+    def contest_pairs(self):
+        return [(contest,contest.pairs(),contest.pair_diffs()) for contest in self.contest_set.all()]
+
     def get_user_ballots(self, user):
         """
         Return all ballots for this user
@@ -46,6 +49,9 @@ class Contest(models.Model):
 
     def sorted_candidates(self):
         return self.candidate_set.order_by('candidate_name')
+
+    def en_sorted_candidates(self):
+        return enumerate(self.candidate_set.order_by('candidate_name'))
 
     def num_candidates(self):
         return len(self.candidate_set.all())
@@ -109,15 +115,35 @@ class Contest(models.Model):
         if self.has_ballots():
             in_dict = self.run_schulze()['pairs']
             cans = self.sorted_candidates()
-            out_dict = {can1:{
-                can2:((
-                    in_dict[(can1,can2)],
+            out_list = [
+                [(
+                    in_dict[(can1,can2)]
+                if can1 != can2 else '-') for can2 in cans]
+                for can1 in cans]
+
+            return out_list
+
+    def pair_diffs(self):
+        """ 
+        dicts of dicts of pairwise comparisons
+        Value of inner dict is a 2-tuple containing:
+          - Number of voters preferring 
+            1st candidate (1st dimension) over 2nd
+          - Difference between number of voters 
+            preferring 1st candidate and
+            number of voters preferring 2nd candidate
+            """
+        if self.has_ballots():
+            in_dict = self.run_schulze()['pairs']
+            cans = self.sorted_candidates()
+            out_list = [
+                [(
                     in_dict[(can1,can2)] - in_dict[(can2,can1)]
-                )
-                if can1 != can2 else '-') for can2 in cans}
-                for can1 in cans}
-            
-            return out_dict
+                if can1 != can2 else '-') for can2 in cans]
+                for can1 in cans]
+
+            #return out_dict
+            return out_list
 
     def get_ballots(self):
         """

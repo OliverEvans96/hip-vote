@@ -1,23 +1,46 @@
 {% extends "site_base.html" %}
 {% load i18n %}
+{% load poll_extras %}
 
 {% block body_base %}
 
 <div class="container">
 
+<section>
 {% if election.has_ballots %}
-<h1> Results for {{ election.election_name }} </h1>
+<h1>Results Summary for {{ election.election_name }}</h1>
+<br />
+
+{% for contest in election.contest_set.all %}
+	<h3>{{ contest.contest_name }}:
+	{% if contest.is_tied %}
+	<strong>{{ contest.tied_winner_names }}</strong> (tie)
+	{% else %}
+		<strong>{{ contest.winner }}</strong>
+	{% endif %}
+	</h3>
+{% endfor %}
+
+</section>
+
+<br />
+<hr />
+<br />
+<section>
+
+<h1>Detailed Results for {{ election.election_name }}</h1>
+
 <p>Pairwise comparison tables show the number of voters who prefer candidate on left over candidate on top</p>
 
 
-{% for contest in election.contest_set.all %}
-	<h3>{{ contest.contest_name }}</h3>
+{% for contest,pairs,pair_diffs in election.contest_pairs %}
+	<h2>{{ contest.contest_name }}</h2>
 	<p>Votes received (excluding abstains): {{ contest.num_meaningful_ballots }}</p>
 	<br />
 	{% if contest.is_tied %}
-		<p>Tied winners: <strong>{{ contest.tied_winner_names }}</strong></p>
+		<h3>Tied winners: <strong>{{ contest.tied_winner_names }}</strong></h3>
 	{% else %}
-		<p>Winner: <strong>{{ contest.winner }}</strong></p>
+		<h3>Winner: <strong>{{ contest.winner }}</strong></h3>
 	{% endif %}
 	<br />
 
@@ -31,20 +54,20 @@
 		<td>{{ can2 }}</td>
 	{% endfor %}
 
-	{% for can1,dct1 in contest.pairs.items %}
+	{% for n1,can1 in contest.en_sorted_candidates %}
 		<tr>
 		<td>{{ can1 }}</td>
-		{% for can2,pair in dct1.items %}
-			{% if can1 == can2 %}
+		{% for n2,can2 in contest.en_sorted_candidates %}
+			{% if n1 == n2 %}
 			<td>
-			{% elif pair.1 > 0 %}
-			<td class="success">
-			{% elif pair.1 < 0 %}
-			<td class="danger">
+			{% elif pair_diffs|return_item:n1|return_item:n2 > 0 %}
+				<td class="success">
+			{% elif pair_diffs|return_item:n1|return_item:n2  < 0 %}
+				<td class="danger">
 			{% else %}
-			<td class="warning">
+				<td class="warning">
 			{% endif %}
-				{{ pair.0 }}
+			{{ pairs|return_item:n1|return_item:n2 }}
 			</td>
 		{% endfor %}
 		</tr>
@@ -81,5 +104,6 @@
 <br />
 <a href="{% url 'polls:index' %}">Back to elections</a>
 
+</section>
 </div>
 {% endblock %}
